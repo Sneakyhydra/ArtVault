@@ -7,6 +7,8 @@ import { nftAddress, nftMarketAddress } from '../config';
 import NFT from '../artifacts/contracts/NFT.sol/NFT.json';
 import KBMarket from '../artifacts/contracts/KBMarket.sol/KBMarket.json';
 
+import Image from 'next/image';
+
 export default function Home() {
 	const [nfts, setNfts] = useState([]);
 	const [loading, setLoading] = useState(true);
@@ -16,31 +18,34 @@ export default function Home() {
 		//eslint-disable-next-line
 	}, []);
 
+	// Function to load NFTs from the blockchain
 	const loadNFTs = async () => {
 		const provider = new ethers.providers.JsonRpcProvider();
-		const tokenContract = new ethers.Contract(nftAddress, NFT.abi, provider);
+		const nftContract = new ethers.Contract(nftAddress, NFT.abi, provider);
 		const marketContract = new ethers.Contract(
 			nftMarketAddress,
 			KBMarket.abi,
 			provider
 		);
+		
+		// Fetch unsold nfts
+		const data = await marketContract.fetchUnsoldNfts();
 
-		const data = await marketContract.fetchMarketTokens();
-
+		// Make data readable
 		const items = await Promise.all(
 			data.map(async (i) => {
-				const tokenURI = await tokenContract.tokenURI(i.tokenId);
+				const tokenURI = await nftContract.tokenURI(i.tokenId);
 				const meta = await axios.get(tokenURI);
 				let price = ethers.utils.formatUnits(i.price.toString(), 'ether');
 
 				let item = {
-					price,
 					tokenId: i.tokenId.toNumber(),
-					seller: i.seller,
 					owner: i.owner,
-					image: meta.data.image,
+					seller: i.seller,
 					name: meta.data.name,
 					description: meta.data.description,
+					image: meta.data.image,
+					price,
 				};
 
 				return item;
@@ -64,7 +69,7 @@ export default function Home() {
 		);
 
 		const price = ethers.utils.parseUnits(nft.price.toString(), 'ether');
-		const transaction = await contract.createMarketSale(
+		const transaction = await contract.buyNft(
 			nftAddress,
 			nft.tokenId,
 			{
@@ -86,7 +91,7 @@ export default function Home() {
 			<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4'>
 				{nfts.map((nft, i) => (
 					<div key={i} className='border shadow rounded-x1 overflow-hidden'>
-						<img src={nft.image} alt='nft' />
+						<Image src={nft.image} alt={nft.name} />
 						<div className='p-4'>
 							<p style={{ height: '64px' }} className='text-3xl font-semibold'>
 								{nft.name}

@@ -1,4 +1,3 @@
-const { expect } = require('chai');
 const { ethers } = require('hardhat');
 
 describe('KBMarket', function () {
@@ -12,7 +11,7 @@ describe('KBMarket', function () {
 		const NFT = await ethers.getContractFactory('NFT');
 		const nft = await NFT.deploy(marketAddress);
 		await nft.deployed();
-		const nftContractAddress = nft.address;
+		const nftAddress = nft.address;
 
 		// test to receive listing price and auction price
 		let listingPrice = await market.getListingPrice();
@@ -24,10 +23,10 @@ describe('KBMarket', function () {
 		await nft.mintToken('https-t1');
 		await nft.mintToken('https-t2');
 
-		await market.makeMarketItem(nftContractAddress, 1, auctionPrice, {
+		await market.mintNft(nftAddress, 1, auctionPrice, {
 			value: listingPrice,
 		});
-		await market.makeMarketItem(nftContractAddress, 2, auctionPrice, {
+		await market.mintNft(nftAddress, 2, auctionPrice, {
 			value: listingPrice,
 		});
 
@@ -38,9 +37,9 @@ describe('KBMarket', function () {
 		// Create a market sale with address, id and price
 		await market
 			.connect(buyerAddress)
-			.createMarketSale(nftContractAddress, 1, { value: auctionPrice });
+			.buyNft(nftAddress, 1, { value: auctionPrice });
 
-		let items = await market.fetchMarketTokens();
+		let items = await market.fetchUnsoldNfts();
 		items = await Promise.all(
 			items.map(async (i) => {
 				const tokenURI = await nft.tokenURI(i.tokenId);
