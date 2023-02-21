@@ -1,5 +1,5 @@
 {
-  "name": "nft-marketplace-kryptobirdz",
+  "name": "artvault",
   "private": true,
   "scripts": {
     "dev": "next dev",

@@ -2,11 +2,11 @@ import '../styles/globals.css';
 import './app.css';
 import Link from 'next/link';
 
-const KryptoBirdzMarketplace = ({ Component, pageProps }) => {
+const ArtVaultMarketplace = ({ Component, pageProps }) => {
 	return (
 		<div>
 			<nav className='border-b p-6' style={{ backgroundColor: 'purple' }}>
-				<p className='text-4x1 font-bold text-white'>KryptoBirdz Marketplace</p>
+				<p className='text-4x1 font-bold text-white'>ArtVault Marketplace</p>
 				<div className='flex mt-4 justify-center'>
 					<Link href='/'>
 						<a className='mr-6'>Main Marketplace</a>
@@ -27,4 +27,4 @@ const KryptoBirdzMarketplace = ({ Component, pageProps }) => {
 	);
 };
 
-export default KryptoBirdzMarketplace;
+export default ArtVaultMarketplace;
